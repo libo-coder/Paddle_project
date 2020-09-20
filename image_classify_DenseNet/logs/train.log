@@ -1,0 +1,26 @@
+2020-03-09 14:06:26,455 - train.py[line:164] - INFO: Loss at epoch 0 step 0: [1.6306293], acc: [0.40625]
+2020-03-09 14:07:00,967 - train.py[line:164] - INFO: Loss at epoch 0 step 40: [1.4798427], acc: [0.265625]
+2020-03-09 14:07:25,247 - train.py[line:173] - INFO: model saved at epoch 0, best accuracy is 0.4166666666666667
+2020-03-09 14:07:26,168 - train.py[line:164] - INFO: Loss at epoch 1 step 0: [1.2032264], acc: [0.46875]
+2020-03-09 14:08:01,188 - train.py[line:164] - INFO: Loss at epoch 1 step 40: [1.1422644], acc: [0.578125]
+2020-03-09 14:08:26,341 - train.py[line:173] - INFO: model saved at epoch 1, best accuracy is 0.45694444444444443
+2020-03-09 14:08:27,338 - train.py[line:164] - INFO: Loss at epoch 2 step 0: [1.2546736], acc: [0.5625]
+2020-03-09 14:09:02,312 - train.py[line:164] - INFO: Loss at epoch 2 step 40: [1.2519169], acc: [0.640625]
+2020-03-09 14:09:26,235 - train.py[line:173] - INFO: model saved at epoch 2, best accuracy is 0.5520833333333334
+2020-03-09 14:09:27,184 - train.py[line:164] - INFO: Loss at epoch 3 step 0: [1.1887345], acc: [0.625]
+2020-03-09 14:10:01,888 - train.py[line:164] - INFO: Loss at epoch 3 step 40: [0.963113], acc: [0.609375]
+2020-03-09 14:10:25,868 - train.py[line:164] - INFO: Loss at epoch 4 step 0: [1.1661512], acc: [0.609375]
+2020-03-09 14:11:00,529 - train.py[line:164] - INFO: Loss at epoch 4 step 40: [0.9893415], acc: [0.59375]
+2020-03-09 14:11:24,229 - train.py[line:173] - INFO: model saved at epoch 4, best accuracy is 0.5930555555555556
+2020-03-09 14:11:25,270 - train.py[line:164] - INFO: Loss at epoch 5 step 0: [1.1620805], acc: [0.484375]
+2020-03-09 14:12:00,006 - train.py[line:164] - INFO: Loss at epoch 5 step 40: [0.9655475], acc: [0.578125]
+2020-03-09 14:12:24,136 - train.py[line:164] - INFO: Loss at epoch 6 step 0: [0.87590384], acc: [0.640625]
+2020-03-09 14:12:59,071 - train.py[line:164] - INFO: Loss at epoch 6 step 40: [1.0555159], acc: [0.5625]
+2020-03-09 14:13:22,416 - train.py[line:164] - INFO: Loss at epoch 7 step 0: [0.79678166], acc: [0.703125]
+2020-03-09 14:13:56,924 - train.py[line:164] - INFO: Loss at epoch 7 step 40: [1.0299878], acc: [0.59375]
+2020-03-09 14:14:21,666 - train.py[line:164] - INFO: Loss at epoch 8 step 0: [0.99066764], acc: [0.625]
+2020-03-09 14:14:55,127 - train.py[line:164] - INFO: Loss at epoch 8 step 40: [0.8330009], acc: [0.703125]
+2020-03-09 14:15:18,747 - train.py[line:173] - INFO: model saved at epoch 8, best accuracy is 0.6583333333333333
+2020-03-09 14:15:19,664 - train.py[line:164] - INFO: Loss at epoch 9 step 0: [0.8782065], acc: [0.640625]
+2020-03-09 14:15:54,402 - train.py[line:164] - INFO: Loss at epoch 9 step 40: [1.199759], acc: [0.46875]
+2020-03-09 14:16:17,738 - train.py[line:174] - INFO: Final loss: [0.7580707]
