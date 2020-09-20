@@ -6,7 +6,7 @@ train_parameters = {
     "class_dim": -1,  # 分类数，会在初始化自定义 reader 的时候获得  
     "image_count": -1,  # 训练图片数量，会在初始化自定义 reader 的时候获得  
     "label_dict": {},  
-    "data_dir": "data/data2815",  # 训练数据存储地址  
+    "data_dir": "E:/project/dataset/image_classify_DenseNet",  # 训练数据存储地址
     "train_file_list": "train.txt",  
     "label_file": "label_list.txt",  
     "save_persistable_dir": "./persistable-params/model",  
@@ -15,7 +15,7 @@ train_parameters = {
     "train_batch_size": 64, 
     "dropout_prob": 0.2,
     "dropout_seed": None,
-    "infer_img": 'data/data2815/sunflowers/3840761441_7c648abf4d_n.jpg',
+    "infer_img": 'E:/project/dataset/image_classify_DenseNet/sunflowers/3840761441_7c648abf4d_n.jpg',   # 预测图片
     "mean_rgb": [127.5, 127.5, 127.5],  # 常用图片的三通道均值，通常来说需要先对训练数据做统计，此处仅取中间值  
     "image_enhance_strategy": {  # 图像增强相关策略  
         "need_distort": True,  # 是否启用图像颜色增强  

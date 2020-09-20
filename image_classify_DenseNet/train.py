@@ -37,10 +37,10 @@ def optimizer_momentum_setting():
     """  
     阶梯型的学习率适合比较大规模的训练数据  
     """
-    learning_strategy = train_parameters['momentum_strategy']
+    learning_strategy = train_parameters['momentum_strategy']       # 学习率的变化位置
     batch_size = train_parameters["train_batch_size"]
     iters = train_parameters["image_count"] // batch_size
-    lr = learning_strategy['learning_rate']
+    lr = learning_strategy['learning_rate']     # 在某个 epoch 的时候学习率的大小
 
     boundaries = [i * iters for i in learning_strategy["lr_epochs"]]
     values = [i * lr for i in learning_strategy["lr_decay"]]
@@ -117,7 +117,8 @@ def eval_net(reader, model):
 def train():
     with fluid.dygraph.guard():
         epoch_num = train_parameters["num_epochs"]
-        net = DenseNet("densenet", layers=121, dropout_prob=train_parameters['dropout_prob'],
+        net = DenseNet("densenet", layers=121,
+                       dropout_prob=train_parameters['dropout_prob'],
                        class_dim=train_parameters['class_dim'])
         optimizer = optimizer_rms_setting(net.parameters())
         file_list = os.path.join(train_parameters['data_dir'], "train.txt")
@@ -127,13 +128,13 @@ def train():
         test_reader = paddle.batch(reader.custom_image_reader(file_list, train_parameters['data_dir'], 'val'),
                                    batch_size=train_parameters['train_batch_size'],
                                    drop_last=True)
+
         if train_parameters["continue_train"]:
             model, _ = fluid.dygraph.load_dygraph(train_parameters["save_persistable_dir"])
             net.load_dict(model)
 
         best_acc = 0
         for epoch_num in range(epoch_num):
-
             for batch_id, data in enumerate(train_reader()):
                 dy_x_data = np.array([x[0] for x in data]).astype('float32')
                 y_data = np.array([x[1] for x in data]).astype('int')
