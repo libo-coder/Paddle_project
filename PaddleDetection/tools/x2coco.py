@@ -13,6 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+用于将 labelme 标注的数据集或 cityscape 数据集转换为 COCO 数据集
+"""
 
 import argparse
 import glob
@@ -86,18 +89,15 @@ def annotations_rectangle(points, label, image_num, object_num, label_to_num):
     annotation['iscrowd'] = 0
     annotation['image_id'] = image_num + 1
     annotation['bbox'] = list(
-        map(float, [
-            points[0][0], points[0][1], points[1][0] - points[0][0], points[1][
-                1] - points[0][1]
-        ]))
+        map(float, [points[0][0], points[0][1], points[1][0] - points[0][0], points[1][1] - points[0][1]])
+    )
     annotation['area'] = annotation['bbox'][2] * annotation['bbox'][3]
     annotation['category_id'] = label_to_num[label]
     annotation['id'] = object_num + 1
     return annotation
 
 
-def annotations_polygon(height, width, points, label, image_num, object_num,
-                        label_to_num):
+def annotations_polygon(height, width, points, label, image_num, object_num, label_to_num):
     annotation = {}
     annotation['segmentation'] = [list(np.asarray(points).flatten())]
     annotation['iscrowd'] = 0
@@ -124,7 +124,9 @@ def get_bbox(height, width, points):
     right_bottom_r = np.max(rows)
     right_bottom_c = np.max(clos)
     return [
-        left_top_c, left_top_r, right_bottom_c - left_top_c,
+        left_top_c,
+        left_top_r,
+        right_bottom_c - left_top_c,
         right_bottom_r - left_top_r
     ]
 
@@ -137,8 +139,7 @@ def deal_json(ds_type, img_path, json_path):
     object_num = -1
     for img_file in os.listdir(img_path):
         img_label = os.path.splitext(img_file)[0]
-        if img_file.split('.')[
-                -1] not in ['bmp', 'jpg', 'jpeg', 'png', 'JPEG', 'JPG', 'PNG']:
+        if img_file.split('.')[-1] not in ['bmp', 'jpg', 'jpeg', 'png', 'JPEG', 'JPG', 'PNG']:
             continue
         label_file = osp.join(json_path, img_label + '.json')
         print('Generating dataset from:', label_file)
@@ -161,8 +162,9 @@ def deal_json(ds_type, img_path, json_path):
                     if p_type == 'polygon':
                         points = shapes['points']
                         annotations_list.append(
-                            annotations_polygon(data['imageHeight'], data[
-                                'imageWidth'], points, label, image_num,
+                            annotations_polygon(data['imageHeight'],
+                                                data['imageWidth'],
+                                                points, label, image_num,
                                                 object_num, label_to_num))
 
                     if p_type == 'rectangle':
@@ -171,8 +173,9 @@ def deal_json(ds_type, img_path, json_path):
                         y1, y2 = sorted([y1, y2])
                         points = [[x1, y1], [x2, y2], [x1, y2], [x2, y1]]
                         annotations_list.append(
-                            annotations_rectangle(points, label, image_num,
-                                                  object_num, label_to_num))
+                            annotations_rectangle(points, label, image_num, object_num, label_to_num)
+                        )
+
             elif ds_type == 'cityscape':
                 for shapes in data['objects']:
                     object_num = object_num + 1
@@ -183,9 +186,11 @@ def deal_json(ds_type, img_path, json_path):
                         label_to_num[label] = len(labels_list)
                     points = shapes['polygon']
                     annotations_list.append(
-                        annotations_polygon(data['imgHeight'], data[
-                            'imgWidth'], points, label, image_num, object_num,
-                                            label_to_num))
+                        annotations_polygon(data['imgHeight'],
+                                            data['imgWidth'],
+                                            points, label, image_num,
+                                            object_num, label_to_num))
+
     data_coco['images'] = images_list
     data_coco['categories'] = categories_list
     data_coco['annotations'] = annotations_list
@@ -199,6 +204,7 @@ def voc_get_label_anno(ann_dir_path, ann_ids_path, labels_path):
 
     with open(ann_ids_path, 'r') as f:
         ann_ids = f.read().split()
+
     ann_paths = []
     for aid in ann_ids:
         if aid.endswith('xml'):
@@ -280,6 +286,7 @@ def voc_xmls_to_cocojson(annotation_paths, label2id, output_dir, output_file):
     for label, label_id in label2id.items():
         category_info = {'supercategory': 'none', 'id': label_id, 'name': label}
         output_json_dict['categories'].append(category_info)
+
     output_file = os.path.join(output_dir, output_file)
     with open(output_file, 'w') as f:
         output_json = json.dumps(output_json_dict)
@@ -287,25 +294,32 @@ def voc_xmls_to_cocojson(annotation_paths, label2id, output_dir, output_file):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--dataset_type', help='the type of dataset')
-    parser.add_argument('--json_input_dir', help='input annotated directory')
-    parser.add_argument('--image_input_dir', help='image directory')
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
-        '--output_dir', help='output dataset directory', default='./')
+        '--dataset_type',       # 需要转换的数据格式，目前支持 labelme 和 cityscape
+        help='the type of dataset')
     parser.add_argument(
-        '--train_proportion',
+        '--json_input_dir',     # 使用 labelme 标注的 json 文件所在的文件夹
+        help='input annotated directory')
+    parser.add_argument(
+        '--image_input_dir',    # 图像所在文件夹
+        help='image directory')
+    parser.add_argument(
+        '--output_dir',         # 转化后的 COCO 格式数据集存放位置
+        help='output dataset directory',
+        default='./')
+    parser.add_argument(
+        '--train_proportion',   # 标注数据中用于 train 的比例
         help='the proportion of train dataset',
         type=float,
         default=1.0)
     parser.add_argument(
-        '--val_proportion',
+        '--val_proportion',     # 标注数据中用于 validation 的比例
         help='the proportion of validation dataset',
         type=float,
         default=0.0)
     parser.add_argument(
-        '--test_proportion',
+        '--test_proportion',    # 标注数据中用于 infer 的比例
         help='the proportion of test dataset',
         type=float,
         default=0.0)
@@ -330,17 +344,16 @@ def main():
         default='voc.json',
         help='In Voc format dataset, path to output json file')
     args = parser.parse_args()
+
     try:
         assert args.dataset_type in ['voc', 'labelme', 'cityscape']
     except AssertionError as e:
-        print(
-            'Now only support the voc, cityscape dataset and labelme dataset!!')
+        print('Now only support the voc, cityscape dataset and labelme dataset!!')
         os._exit(0)
 
     if args.dataset_type == 'voc':
         assert args.voc_anno_dir and args.voc_anno_list and args.voc_label_list
-        label2id, ann_paths = voc_get_label_anno(
-            args.voc_anno_dir, args.voc_anno_list, args.voc_label_list)
+        label2id, ann_paths = voc_get_label_anno(args.voc_anno_dir, args.voc_anno_list, args.voc_label_list)
         voc_xmls_to_cocojson(
             annotation_paths=ann_paths,
             label2id=label2id,
@@ -358,12 +371,9 @@ def main():
             print('The image folder does not exist!')
             os._exit(0)
         try:
-            assert abs(args.train_proportion + args.val_proportion \
-                    + args.test_proportion - 1.0) < 1e-5
+            assert abs(args.train_proportion + args.val_proportion + args.test_proportion - 1.0) < 1e-5
         except AssertionError as e:
-            print(
-                'The sum of pqoportion of training, validation and test datase must be 1!'
-            )
+            print('The sum of pqoportion of training, validation and test datase must be 1!')
             os._exit(0)
 
         # Allocate the dataset.
@@ -407,6 +417,7 @@ def main():
         # Deal with the json files.
         if not os.path.exists(args.output_dir + '/annotations'):
             os.makedirs(args.output_dir + '/annotations')
+
         if args.train_proportion != 0:
             train_data_coco = deal_json(args.dataset_type,
                                         args.output_dir + '/train',
@@ -418,6 +429,7 @@ def main():
                 open(train_json_path, 'w'),
                 indent=4,
                 cls=MyEncoder)
+
         if args.val_proportion != 0:
             val_data_coco = deal_json(args.dataset_type,
                                       args.output_dir + '/val',
@@ -429,6 +441,7 @@ def main():
                 open(val_json_path, 'w'),
                 indent=4,
                 cls=MyEncoder)
+
         if args.test_proportion != 0:
             test_data_coco = deal_json(args.dataset_type,
                                        args.output_dir + '/test',

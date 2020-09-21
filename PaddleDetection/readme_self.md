@@ -43,3 +43,30 @@ python -u tools/infer.py \
        -o weights=https://paddlemodels.bj.bcebos.com/object_detection/yolov3_mobilenet_v1_fruit.tar \
        --infer_img=demo/orange_71.jpg
 ```
+
+
+### 二、训练自定义的数据集
+
+#### 1. 准备数据
+
+**方式一：** 将数据集转换为 COCO 数据集
+
+```bash
+python ./ppdet/data/tools/x2coco.py \
+       --dataset_type labelme \
+       --json_input_dir ./labelme_annos/ \
+       --image_input_dir ./labelme_imgs/ \
+       --output_dir ./cocome/ \
+       --train_proportion 0.8 \
+       --val_proportion 0.2 \
+       --test_proportion 0.0 \
+```
+
+**方式二：** 将数据集转换为 VOC 格式
+
+VOC数据集所必须的文件内容如下所示：
+数据集根目录需有 VOCdevkit/VOC2007 或 VOCdevkit/VOC2012 文件夹，
+该文件夹中需有 `Annotations`,`JPEGImages` 和 `ImageSets/Main` 三个子目录，
+`Annotations` 存放图片标注的 `xml` 文件，
+`JPEGImages` 存放数据集图片，
+`ImageSets/Main` 存放训练 `trainval.txt` 和测试 `test.txt` 列表。
