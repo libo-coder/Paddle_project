@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/image_classify_DenseNet" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/object_detection" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/object_detection_ssd" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/PaddleDetection" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.7 (paddle)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

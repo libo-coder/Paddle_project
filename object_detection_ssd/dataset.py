@@ -9,9 +9,8 @@ import six
 import math
 from PIL import Image, ImageEnhance
 
-from net import bbox, sampler
 from config import train_parameters
-from utils import log_feed_image
+from utils import log_feed_image, bbox, sampler
 
 def bbox_area(src_bbox):
     width = src_bbox.xmax - src_bbox.xmin

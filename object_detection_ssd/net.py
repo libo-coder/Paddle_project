@@ -131,25 +131,3 @@ class MobileNetSSD:
         return mbox_locs, mbox_confs, box, box_var   # 返回gound_truth的位置（中心点的坐标、长、宽）、预测框对输入的置信度、候选框、方差
 
 
-########################### 定义训练时候，数据增强需要的辅助类，例如外接矩形框、采样器 ###################
-class sampler:
-    def __init__(self, max_sample, max_trial, min_scale, max_scale,
-                 min_aspect_ratio, max_aspect_ratio, min_jaccard_overlap,
-                 max_jaccard_overlap):
-        self.max_sample = max_sample
-        self.max_trial = max_trial
-        self.min_scale = min_scale
-        self.max_scale = max_scale
-        self.min_aspect_ratio = min_aspect_ratio
-        self.max_aspect_ratio = max_aspect_ratio
-        self.min_jaccard_overlap = min_jaccard_overlap
-        self.max_jaccard_overlap = max_jaccard_overlap
-
-
-class bbox:
-    def __init__(self, xmin, ymin, xmax, ymax):
-        self.xmin = xmin
-        self.ymin = ymin
-        self.xmax = xmax
-        self.ymax = ymax
-
