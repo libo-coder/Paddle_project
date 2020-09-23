@@ -1,3 +1,8 @@
+# coding=utf-8
+"""
+数据源定义的基类，所有的数据集继承于此
+@author: libo
+"""
 # Copyright (c) 2019 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,31 +60,47 @@ class DataSet(object):
         self._imid2path = None
 
     def load_roidb_and_cname2cid(self):
-        """load dataset"""
-        raise NotImplementedError('%s.load_roidb_and_cname2cid not available' %
-                                  (self.__class__.__name__))
+        """load dataset
+        加载 DataSet 中 Roidb 数据源 list，类别名到 id 的映射 dict
+        在 DataSet 基类中并没有做实际的操作，需要在子类中重写实际的操作
+        """
+        raise NotImplementedError('%s.load_roidb_and_cname2cid not available' % (self.__class__.__name__))
 
     def get_roidb(self):
+        """
+        获取数据源
+        :return: list[dict] , Roidb 数据源
+        """
         if not self.roidbs:
-            data_dir = get_dataset_path(self.dataset_dir, self.anno_path,
-                                        self.image_dir)
+            data_dir = get_dataset_path(self.dataset_dir, self.anno_path, self.image_dir)
             if data_dir:
                 self.dataset_dir = data_dir
             self.load_roidb_and_cname2cid()
-
         return self.roidbs
 
     def get_cname2cid(self):
+        """
+        获取标签 id
+        :return: dict , 类别名到 id 的映射
+        """
         if not self.cname2cid:
             self.load_roidb_and_cname2cid()
         return self.cname2cid
 
     def get_anno(self):
+        """
+        获取标注文件路径
+        :return: str, 标注文件路径
+        """
         if self.anno_path is None:
             return
         return os.path.join(self.dataset_dir, self.anno_path)
 
     def get_imid2path(self):
+        """
+        获取图片路径
+        :return: dict, 图片路径
+        """
         return self._imid2path
 
 

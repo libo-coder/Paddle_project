@@ -1,3 +1,10 @@
+# coding=utf-8
+"""
+定义并注册了 VOCDataSet 数据源类，它继承自 DataSet 基类，并重写了 laod_roidb_and_cname2cid，
+解析 VOC 数据集中 xml 格式标注文件，更新 roidb 和 cname2cid
+
+@author: libo
+"""
 # Copyright (c) 2019 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -93,8 +100,7 @@ class VOCDataSet(DataSet):
         if not self.use_default_label:
             label_path = os.path.join(self.dataset_dir, self.label_list)
             if not os.path.exists(label_path):
-                raise ValueError("label_list {} does not exists".format(
-                    label_path))
+                raise ValueError("label_list {} does not exists".format(label_path))
             with open(label_path, 'r') as fr:
                 label_id = int(self.with_background)
                 for line in fr.readlines():
@@ -108,16 +114,12 @@ class VOCDataSet(DataSet):
                 line = fr.readline()
                 if not line:
                     break
-                img_file, xml_file = [os.path.join(image_dir, x) \
-                        for x in line.strip().split()[:2]]
+                img_file, xml_file = [os.path.join(image_dir, x) for x in line.strip().split()[:2]]
                 if not os.path.exists(img_file):
-                    logger.warn(
-                        'Illegal image file: {}, and it will be ignored'.format(
-                            img_file))
+                    logger.warn('Illegal image file: {}, and it will be ignored'.format(img_file))
                     continue
                 if not os.path.isfile(xml_file):
-                    logger.warn('Illegal xml file: {}, and it will be ignored'.
-                                format(xml_file))
+                    logger.warn('Illegal xml file: {}, and it will be ignored'.format(xml_file))
                     continue
                 tree = ET.parse(xml_file)
                 if tree.find('id') is None:
@@ -129,9 +131,7 @@ class VOCDataSet(DataSet):
                 im_w = float(tree.find('size').find('width').text)
                 im_h = float(tree.find('size').find('height').text)
                 if im_w < 0 or im_h < 0:
-                    logger.warn(
-                        'Illegal width: {} or height: {} in annotation, '
-                        'and {} will be ignored'.format(im_w, im_h, xml_file))
+                    logger.warn('Illegal width: {} or height: {} in annotation, and {} will be ignored'.format(im_w, im_h, xml_file))
                     continue
                 gt_bbox = []
                 gt_class = []
@@ -156,10 +156,7 @@ class VOCDataSet(DataSet):
                         is_crowd.append([0])
                         difficult.append([_difficult])
                     else:
-                        logger.warn(
-                            'Found an invalid bbox in annotations: xml_file: {}'
-                            ', x1: {}, y1: {}, x2: {}, y2: {}.'.format(
-                                xml_file, x1, y1, x2, y2))
+                        logger.warn('Found an invalid bbox in annotations: xml_file: {}, x1: {}, y1: {}, x2: {}, y2: {}.'.format(xml_file, x1, y1, x2, y2))
                 gt_bbox = np.array(gt_bbox).astype('float32')
                 gt_class = np.array(gt_class).astype('int32')
                 gt_score = np.array(gt_score).astype('float32')
@@ -182,8 +179,7 @@ class VOCDataSet(DataSet):
                 ct += 1
                 if self.sample_num > 0 and ct >= self.sample_num:
                     break
-        assert len(records) > 0, 'not found any voc record in %s' % (
-            self.anno_path)
+        assert len(records) > 0, 'not found any voc record in %s' % (self.anno_path)
         logger.debug('{} samples in file {}'.format(ct, anno_path))
         self.roidbs, self.cname2cid = records, cname2cid
 
