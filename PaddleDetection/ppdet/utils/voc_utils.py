@@ -50,9 +50,9 @@ def create_list(year_dirs, output_dir):
             fval.write(item[0] + ' ' + item[1] + '\n')
 
 
-def _walk_voc_dir(year_dir, output_dir):
-    filelist_dir = osp.join(year_dir, 'ImageSets/Main')
-    annotation_dir = osp.join(year_dir, 'Annotations')
+def _walk_voc_dir(year_dir, output_dir):                    # output_dir: E:/project/dataset/insect_voc
+    filelist_dir = osp.join(year_dir, 'ImageSets/Main')     # E:/project/dataset/insect_voc/VOCdevkit/VOC2007/ImageSets/Main
+    annotation_dir = osp.join(year_dir, 'Annotations')      # E:/project/dataset/insect_voc/VOCdevkit/VOC2007/Annotations
     img_dir = osp.join(year_dir, 'JPEGImages')
     trainval_list = []
     test_list = []
@@ -61,9 +61,11 @@ def _walk_voc_dir(year_dir, output_dir):
     img_dict = {}
     for img_file in os.listdir(img_dir):
         img_dict[img_file.split('.')[0]] = img_file
+    # print('img_dict: ', img_dict)       # img_dict:  {'test': 'test', 'train': 'train', 'val': 'val'}
 
     for _, _, files in os.walk(filelist_dir):
         for fname in files:
+            print(fname)
             img_ann_list = []
             if re.match('trainval\.txt', fname):
                 img_ann_list = trainval_list
@@ -71,17 +73,17 @@ def _walk_voc_dir(year_dir, output_dir):
                 img_ann_list = test_list
             else:
                 continue
-            fpath = osp.join(filelist_dir, fname)
+            fpath = osp.join(filelist_dir, fname)          # E:/project/dataset/insect_voc/VOCdevkit/VOC2007/ImageSets/Main/test.txt
             for line in open(fpath):
                 name_prefix = line.strip().split()[0]
+                # print(name_prefix)
                 if name_prefix in added:
                     continue
                 added.add(name_prefix)
-                ann_path = osp.join(
-                    osp.relpath(annotation_dir, output_dir),
-                    name_prefix + '.xml')
-                img_path = osp.join(
-                    osp.relpath(img_dir, output_dir), img_dict[name_prefix])
+                ann_path = osp.join(osp.relpath(annotation_dir, output_dir), name_prefix + '.xml')
+                # print('ann_path: ', ann_path)            # VOCdevkit/VOC2007/Annotations/1.xml
+                img_path = osp.join(osp.relpath(img_dir, output_dir), img_dict[name_prefix])
+                # print('img_path: ', img_path)            # VOCdevkit/VOC2007/JPEGImages/1.jpeg
                 img_ann_list.append((img_path, ann_path))
 
     return trainval_list, test_list

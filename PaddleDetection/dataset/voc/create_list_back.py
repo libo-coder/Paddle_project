@@ -40,9 +40,8 @@ if __name__ == '__main__':
     default_voc_path = osp.split(osp.realpath(sys.argv[0]))[0]
     parser.add_argument(
         "-d",
-        "--dataset_dir",        # VOC格式数据集所在文件夹路径
-        # default=default_voc_path,
-        default='E:/project/dataset/insect_voc',
+        "--dataset_dir",        # VOC 格式数据集所在文件夹路径
+        default=default_voc_path,
         type=str,
         help="VOC dataset directory, default is current directory.")
     config = parser.parse_args()

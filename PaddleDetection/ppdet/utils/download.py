@@ -154,8 +154,9 @@ def get_dataset_path(path, annotation, image_dir):
 
 def create_voc_list(data_dir, devkit_subdir='VOCdevkit'):
     logger.debug("Create voc file list...")
-    devkit_dir = osp.join(data_dir, devkit_subdir)
+    devkit_dir = osp.join(data_dir, devkit_subdir)      # `E:/project/dataset/insect_voc/VOCdevkit`
     year_dirs = [osp.join(devkit_dir, x) for x in os.listdir(devkit_dir)]
+    print('year_dirs: ', year_dirs)         # 'E:/project/dataset/insect_voc/VOCdevkit/VOC2007'
 
     # NOTE: since using auto download VOC
     # dataset, VOC default label list should be used, 

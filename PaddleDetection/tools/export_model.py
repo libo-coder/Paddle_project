@@ -1,3 +1,5 @@
+# coding=utf-8
+
 # Copyright (c) 2019 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +34,7 @@ from ppdet.utils.check import check_config, check_version, check_py_func
 import yaml
 import logging
 from collections import OrderedDict
+
 FORMAT = '%(asctime)s-%(levelname)s: %(message)s'
 logging.basicConfig(level=logging.INFO, format=FORMAT)
 logger = logging.getLogger(__name__)

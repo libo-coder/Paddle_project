@@ -1,3 +1,8 @@
+# coding=utf-8
+"""
+Python 端预测部署
+此种方式依赖 PaddleDetection 源码；也可以使用导出预测模型的方式，先将模型导出，使用一个独立的文件进行预测。
+"""
 # Copyright (c) 2019 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
