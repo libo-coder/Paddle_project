@@ -1,16 +1,13 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# coding=utf-8
+"""
+python端预测部署
+此种方式依赖 PaddleDetection 源码；也可以使用导出预测模型的方式，先将模型导出，使用一个独立的文件进行预测。
+
+执行命令：
+    python deploy/python/infer.py --model_dir=/path/to/models --image_file=/path/to/image --use_gpu=(False/True)
+
+@author: libo
+"""
 
 import os
 import argparse
@@ -60,17 +57,10 @@ class Resize(object):
         image_shape (list): input shape of model
         interp (int): method of resize
     """
-
-    def __init__(self,
-                 arch,
-                 target_size,
-                 max_size,
-                 use_cv2=True,
-                 image_shape=None,
-                 interp=cv2.INTER_LINEAR):
+    def __init__(self, arch, target_size, max_size, use_cv2=True, image_shape=None, interp=cv2.INTER_LINEAR):
         self.target_size = target_size
         self.max_size = max_size
-        self.image_shape = image_shape,
+        self.image_shape = image_shape
         self.arch = arch
         self.use_cv2 = use_cv2
         self.interp = interp
@@ -88,20 +78,12 @@ class Resize(object):
         im_channel = im.shape[2]
         im_scale_x, im_scale_y = self.generate_scale(im)
         if self.use_cv2:
-            im = cv2.resize(
-                im,
-                None,
-                None,
-                fx=im_scale_x,
-                fy=im_scale_y,
-                interpolation=self.interp)
+            im = cv2.resize(im, None, None, fx=im_scale_x, fy=im_scale_y, interpolation=self.interp)
         else:
             resize_w = int(im_scale_x * float(im.shape[1]))
             resize_h = int(im_scale_y * float(im.shape[0]))
             if self.max_size != 0:
-                raise TypeError(
-                    'If you set max_size to cap the maximum size of image,'
-                    'please set use_cv2 to True to resize the image.')
+                raise TypeError('If you set max_size to cap the maximum size of image, please set use_cv2 to True to resize the image.')
             im = im.astype('uint8')
             im = Image.fromarray(im)
             im = im.resize((int(resize_w), int(resize_h)), self.interp)
@@ -109,8 +91,7 @@ class Resize(object):
 
         # padding im when image_shape fixed by infer_cfg.yml
         if self.max_size != 0 and self.image_shape is not None:
-            padding_im = np.zeros(
-                (self.max_size, self.max_size, im_channel), dtype=np.float32)
+            padding_im = np.zeros((self.max_size, self.max_size, im_channel), dtype=np.float32)
             im_h, im_w = im.shape[:2]
             padding_im[:im_h, :im_w, :] = im
             im = padding_im
@@ -338,12 +319,10 @@ def load_predictor(model_dir,
         ValueError: predict by TensorRT need use_gpu == True.
     """
     if not use_gpu and not run_mode == 'fluid':
-        raise ValueError(
-            "Predict by TensorRT mode: {}, expect use_gpu==True, but use_gpu == {}"
-            .format(run_mode, use_gpu))
+        raise ValueError("Predict by TensorRT mode: {}, expect use_gpu==True, but use_gpu == {}".format(run_mode, use_gpu))
     if run_mode == 'trt_int8':
-        raise ValueError("TensorRT int8 mode is not supported now, "
-                         "please use trt_fp32 or trt_fp16 instead.")
+        raise ValueError("TensorRT int8 mode is not supported now, please use trt_fp32 or trt_fp16 instead.")
+
     precision_map = {
         'trt_int8': fluid.core.AnalysisConfig.Precision.Int8,
         'trt_fp32': fluid.core.AnalysisConfig.Precision.Float32,
@@ -352,6 +331,7 @@ def load_predictor(model_dir,
     config = fluid.core.AnalysisConfig(
         os.path.join(model_dir, '__model__'),
         os.path.join(model_dir, '__params__'))
+
     if use_gpu:
         # initial GPU memory(M), device ID
         config.enable_use_gpu(100, 0)
@@ -621,42 +601,53 @@ def print_arguments(args):
 
 
 if __name__ == '__main__':
+    """
+    PaddlePaddle 默认的 GPU 安装包(<=1.7)，不支持基于 TensorRT 进行预测，如果想基于 TensorRT 加速预测，需要自行编译
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--model_dir",
+        "--model_dir",      # 必须传入的参数，导出的模型路径
         type=str,
         default=None,
-        help=("Directory include:'__model__', '__params__', "
-              "'infer_cfg.yml', created by tools/export_model.py."),
+        help="Directory include:'__model__', '__params__', 'infer_cfg.yml', created by tools/export_model.py.",
         required=True)
     parser.add_argument(
-        "--image_file", type=str, default='', help="Path of image file.")
+        "--image_file",     # 需要预测的图片
+        type=str,
+        default='',
+        help="Path of image file.")
     parser.add_argument(
-        "--video_file", type=str, default='', help="Path of video file.")
+        "--video_file",     # 需要预测的视频
+        type=str,
+        default='',
+        help="Path of video file.")
     parser.add_argument(
-        "--camera_id",
+        "--camera_id",      # 用来预测的摄像头 ID，默认为 -1，表示不使用摄像头预测，可设置为0，预测过程中在可视化界面按 q 退出输出预测结果到 output/output.mp4
         type=int,
         default=-1,
         help="device id of camera to predict.")
     parser.add_argument(
-        "--run_mode",
+        "--run_mode",       # 使用 GPU 时，默认为 fluid，fluid代表使用 AnalysisPredictor，精度float32来推理，其他参数指用AnalysisPredictor，TensorRT不同精度来推理。
         type=str,
         default='fluid',
         help="mode of running(fluid/trt_fp32/trt_fp16)")
     parser.add_argument(
-        "--use_gpu",
+        "--use_gpu",        # 是否使用 GPU
         type=ast.literal_eval,
         default=False,
         help="Whether to predict with GPU.")
     parser.add_argument(
-        "--run_benchmark",
+        "--run_benchmark",  # 是否运行 benchmark，同时需指定 --image_file
         type=ast.literal_eval,
         default=False,
         help="Whether to predict a image_file repeatedly for benchmark")
     parser.add_argument(
-        "--threshold", type=float, default=0.5, help="Threshold of score.")
+        "--threshold",      # 预测得分的阈值
+        type=float,
+        default=0.5,
+        help="Threshold of score.")
     parser.add_argument(
-        "--output_dir",
+        "--output_dir",     # 可视化结果保存目录
         type=str,
         default="output",
         help="Directory of output visualization files.")

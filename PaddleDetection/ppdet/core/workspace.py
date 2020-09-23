@@ -1,17 +1,8 @@
-# Copyright (c) 2019 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+# coding=utf-8
+"""
+提供配置系统的大多数功能
+@author: libo
+"""
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import division
@@ -52,8 +43,7 @@ def dump_value(value):
 
 
 class AttrDict(dict):
-    """Single level attribute dict, NOT recursive"""
-
+    """ Single level attribute dict, NOT recursive """
     def __init__(self, **kwargs):
         super(AttrDict, self).__init__()
         super(AttrDict, self).update(kwargs)
@@ -113,8 +103,7 @@ def dict_merge(dct, merge_dct):
     Returns: dct
     """
     for k, v in merge_dct.items():
-        if (k in dct and isinstance(dct[k], dict) and
-                isinstance(merge_dct[k], collections.Mapping)):
+        if (k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], collections.Mapping)):
             dict_merge(dct[k], merge_dct[k])
         else:
             dct[k] = merge_dct[k]
@@ -178,6 +167,7 @@ def make_partial(cls):
 
 def register(cls):
     """
+    装饰器，将类注册为可配置模块；能够识别类定义中的一些特殊标注
     Register a given module class.
 
     Args:
@@ -186,8 +176,7 @@ def register(cls):
     Returns: cls
     """
     if cls.__name__ in global_config:
-        raise ValueError("Module class already registered: {}".format(
-            cls.__name__))
+        raise ValueError("Module class already registered: {}".format(cls.__name__))
     if hasattr(cls, '__op__'):
         cls = make_partial(cls)
     global_config[cls.__name__] = extract_schema(cls)
@@ -203,12 +192,9 @@ def create(cls_or_name, **kwargs):
 
     Returns: instance of type `cls_or_name`
     """
-    assert type(cls_or_name) in [type, str
-                                 ], "should be a class or name of a class"
+    assert type(cls_or_name) in [type, str], "should be a class or name of a class"
     name = type(cls_or_name) == str and cls_or_name or cls_or_name.__name__
-    assert name in global_config and \
-        isinstance(global_config[name], SchemaDict), \
-        "the module {} is not registered".format(name)
+    assert name in global_config and isinstance(global_config[name], SchemaDict), "the module {} is not registered".format(name)
     config = global_config[name]
     config.update(kwargs)
     config.validate()
@@ -223,8 +209,7 @@ def create(cls_or_name, **kwargs):
             target_key = config[k]
             shared_conf = config.schema[k].default
             assert isinstance(shared_conf, SharedConfig)
-            if target_key is not None and not isinstance(target_key,
-                                                         SharedConfig):
+            if target_key is not None and not isinstance(target_key, SharedConfig):
                 continue  # value is given for the module
             elif shared_conf.key in global_config:
                 # `key` is present in config

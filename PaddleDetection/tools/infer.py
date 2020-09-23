@@ -1,21 +1,8 @@
 # coding=utf-8
 """
-Python 端预测部署
-此种方式依赖 PaddleDetection 源码；也可以使用导出预测模型的方式，先将模型导出，使用一个独立的文件进行预测。
+模型预测
+@author: libo
 """
-# Copyright (c) 2019 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -111,7 +98,7 @@ def main():
     dataset.set_images(test_images)
 
     place = fluid.CUDAPlace(0) if cfg.use_gpu else fluid.CPUPlace()
-    exe = fluid.Executor(place)
+    exe = fluid.Executor(place)         # Executor同时支持训练和预测
 
     model = create(main_arch)
 
@@ -165,6 +152,7 @@ def main():
     # use VisualDL to log image
     if FLAGS.use_vdl:
         assert six.PY3, "VisualDL requires Python >= 3.5"
+        """ 注意： visualdl 这个包暂时不知道 CPU 版本的 Windows，一旦安装，环境错误 """
         from visualdl import LogWriter
         vdl_writer = LogWriter(FLAGS.vdl_log_dir)
         vdl_image_step = 0
@@ -176,10 +164,7 @@ def main():
                        feed=data,
                        fetch_list=values,
                        return_numpy=False)
-        res = {
-            k: (np.array(v), v.recursive_sequence_lengths())
-            for k, v in zip(keys, outs)
-        }
+        res = {k: (np.array(v), v.recursive_sequence_lengths()) for k, v in zip(keys, outs)}
         logger.info('Infer iter {}'.format(iter_id))
         if 'TTFNet' in cfg.architecture:
             res['bbox'][1].append([len(res['bbox'][0])])
